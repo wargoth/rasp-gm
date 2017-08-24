@@ -15,7 +15,7 @@ imaxw = -1
 jmaxw = -1
 kmaxw = -1
 angle =  0.
-rad2deg = 4.0*atan(1.0)
+rad2deg = 45.0/atan(1.0)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1655,15 +1655,9 @@ begin
 				locn = wrf_user_find_ij_lat_long(f, yfloat, xfloat)		; 0 based => +1
 				xsection := floattointeger(locn(1)+1)				; Note ":=" operator requires NCL >= V6.1.2
 				ysection := floattointeger(locn(0)+1)
-			; Alas str_match_regex() requires NCL V6.3
-                        ; else if( .not. ismissing(str_match_regex(xfield, "[0-9]+")) \
-                        ;         .and. .not. ismissing(str_match_regex(yfield, "[0-9]+")))     ; x / y
                         else
-				xsection = stringtointeger(xfield)
+				xsection = stringtointeger(xfield)				; x & y indices
 				ysection = stringtointeger(yfield)
-			; else
-			; 	print("Error: invalid xbl locn ("+xfield+","+yfield+")")
-			; end if
 			end if
 
 			; Sane?
@@ -1673,11 +1667,10 @@ begin
 				continue
 			end if
 
-			if(anglefield .ne. "") then		; Note meteorological wind direction
+			if(anglefield .ne. "") then		; Note we use meteorological wind direction here
 				if(anglefield .eq. "windk")						; Windk
 					windk = stringtointeger(extract_string_field(params(p), 5, "_"))
 					angle = atan2(uEW(windk,ysection,xsection), vNS(windk,ysection,xsection)) * rad2deg + 180.
-				; else if(.not. ismissing(str_match_regex(anglefield, "press[0-9]+")))	; Pressure level
 				else
 					ang_chars = stringtochar(anglefield)
 					if(sizeof(ang_chars) .gt. 6 .and. ang_chars(0:4) .eq. "press") ; ang_chars has terminating NULL
@@ -1690,17 +1683,6 @@ begin
 					end if
 					delete(ang_chars)
 				end if
-				; else if(.not. ismissing(str_match_regex(anglefield, "[a-z]+")))
-				; 	print("Error: unsupported angle parameter field for xbl (" + anglefield + ")")
-				; 	continue
-				; else if(.not. ismissing(str_match_regex(anglefield, "[0-9]+")))		; Explicit angle
-				;	angle = stringtofloat(anglefield)
-				; else	
-				;	print("Error: Invalid angle field for xbl (" + anglefield + ")")
-				;	continue
-				; end if
-				; end if
-				; end if
 			else
 				print("Error: No angle specified for xbl!")
 				continue
