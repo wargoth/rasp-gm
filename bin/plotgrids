@@ -1,0 +1,3 @@
+rm -f wps_show_dom.png
+ncl $BASEDIR/bin/plotgrids.ncl
+eog wps_show_dom.png

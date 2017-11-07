@@ -1,0 +1,245 @@
+#! /bin/bash
+
+# PLOT wrfout files
+# Usage: replot.sh -r REGION [-d OUTDIR] [-p param,...] [-l LOGDIR] [-w wrffile] [-o]
+# Warning: Only d02 files from GFS
+
+# MUST have BASEDIR
+if ( [ x${BASEDIR} = "x" ] ); then
+  echo "BASEDIR is not set"
+  exit 1
+fi
+
+. $BASEDIR/rasp.site.runenvironment
+
+# Comment out if you want ".curr+N." for REGIONXYZ+N
+export CURR_ONLY=1
+
+# Check for Graphics Magick (gm) / convert
+export CONVERT="gm convert"
+out=`which gm 2> /dev/null | wc -l`
+if [ $out = 0 ]; then
+  out=`which convert | wc -l`
+  if [ $out = 0 ]; then
+    echo ERROR: Neither gm nor convert found
+    exit 1
+  else
+    export CONVERT=convert
+  fi
+fi                                                                             
+
+# Specify Output Image Size (1600 is default)
+# export GMIMAGESIZE=1600
+
+# Set the o/p format to "x11", "png" or "ncgm" (lower-case)
+# Choose ONE only!
+# export FMT="x11"
+# export FMT="png"	# (Default)
+# export FMT="ncgm"	# Not really supported (Who wants it?)
+
+# You can specify PROJECTION to be Lambert, in which case o/p is same as Traditional DrJack 
+# Useful as a test.
+# export PROJECTION="Mercator" # Default
+# export PROJECTION="Lambert"
+
+function usage
+{
+   echo "Usage: replot -r REGION [-d OUTDIR] [-p param,...] [-l LOGDIR] [-w wrfout_file] [-o]"
+   exit 1
+}
+
+export NCL_DEF_LIB_DIR=$BASEDIR/GM/LIB
+
+if ( [ $# = 0 ] ); then
+   usage
+fi
+
+
+LOGDIR=""   # ncl output to terminal; if a dir given, do ncl in parallel and log to separate files
+PREVIOUS=0  # Use "previous.wrfout... file(s)
+REGION=""   # This _must_ be specified
+OUTDIR="."  # Override with -d OUTDIR
+WRFFILE=""  # Do all wrffiles; override with -w wrffile
+
+while getopts "d:l:p:r:w:o" arg; do
+  case $arg in
+    d) OUTDIR=$OPTARG  ;;
+    l) LOGDIR=$OPTARG  ;;
+    o) PREVIOUS=1;     ;;
+    p) PARAMS=$OPTARG  ;;
+    r) REGION=$OPTARG  ;;
+    w) WRFFILE=$OPTARG ;;
+    *) usage           ;;
+  esac
+done
+# echo -e "OUTDIR=   $OUTDIR\nREGION=   $REGION\nPARAMS=   $PARAMS\nLOGDIR=   $LOGDIR\nPREVIOUS= $PREVIOUS\nWRFFILE= $WRFFILE"
+
+if ( [ x${REGION} = "x" ] ); then
+   echo -e "Region is not specified!\nUse -r option"
+   exit
+fi
+REGIONDIR=$BASEDIR/$REGION
+if ( [ ! -d $REGIONDIR ] ); then
+  usage
+fi
+
+# Enable running anywhere
+LOGDIR=`pwd`/$LOGDIR
+OUTDIR=`pwd`/$OUTDIR
+
+# Find the Initialisation time from a grib file (No ETA - yet?)
+gribfile=`ls $REGIONDIR/GRIB/* | tail -1`
+if `echo $gribfile | grep -q gfs`
+then
+    inithr=`echo $gribfile | sed -e 's/.*gfs\.t\([01][0628]\)z\.pgrb2.*/\1/' `
+else
+    inithr=`echo $gribfile | sed -e 's/.*nam\.t\([01][0628]\)z\..*.grib2/\1/' `
+fi
+
+# Treat a specified wrffile
+if ( [ x${WRFFILE} != "x" ] ); then
+  WRFFILES=$REGIONDIR/`basename $WRFFILE`
+  # Deal with a possible -o flag
+  # This is not really necessary, as "previous" can be given in the filename!
+  if ( [ $PREVIOUS -eq 1 ] ); then
+    if ( [ `echo $WRFFILES | grep -c previous` -eq "0" ] ); then
+      WRFFILES=`echo $WRFFILES | sed -e 's/\(wrfout_\)/previous.\1/'`
+    fi
+  fi
+else # Do them all!
+  if ( [ $PREVIOUS -eq 1 ] ); then
+    WRFFILES=`ls $REGIONDIR/previous.wrfout_d02*0`
+  else
+    WRFFILES=`ls $REGIONDIR/wrfout_d02*0`
+  fi
+fi
+
+# If PARAM(S) are not specified, get the list from rasp.run.parameteters.$REGION
+if ( [ x${PARAMS} = "x" ] ); then
+  PARAMS=`grep PARAMETER_DOLIST{\'$REGION\'} $REGIONDIR/rasp.run.parameters.$REGION`
+fi
+PARAMS=`echo $PARAMS | sed -e 's/^.*= (//' | tr \' " " | sed -e 's/);.*PARAMETER.*(/,/' | tr -d " " | sed -e 's/);//' | tr , :`
+
+# There may be wrfout files for times not in PLOT_HHMMLIST
+HHMMLIST=`grep "\\$PLOT_HHMMLIST" $REGIONDIR/rasp.run.parameters.$REGION | grep -v " *#"`
+
+# Ensure Log Directory exists
+if ( [ x${LOGDIR} != "x" ] ); then
+  if [ ! -d $LOGDIR ]; then
+    mkdir -p $LOGDIR
+  else  # and is writable
+    if [ ! -w $LOGDIR ] ; then
+      echo "$LOGDIR is not writable"
+      exit 1
+    fi
+  fi
+fi
+
+# Ensure Output Directories exist
+if [ ! -d $OUTDIR ] ; then
+  mkdir -p $OUTDIR
+else  # and are writable
+  if [ ! -w $OUTDIR ] ; then
+    echo "$OUTDIR is not writable"
+    exit 1
+  fi
+fi
+
+export LOGDIR=$LOGDIR
+export ENV_NCL_REGIONNAME=$REGION
+export ENV_NCL_OUTDIR=$OUTDIR
+export ENV_NCL_PARAMS=$PARAMS
+export ENV_NCL_INITMODE="GFSN"
+
+# Function to actually plot a wrfout file
+function do_file
+{
+   local F=$ENV_NCL_FILENAME
+
+   # Note that FILEDATE, etc are from the file *name*, _not_ creation time
+   FILEDATE=`echo $F | sed -e 's/.*wrfout_d0._\(2[0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\)_.*/\1/'`
+   FILETIME=`echo $F | sed -e 's/.*wrfout_d0._.*_\([0-9][0-9]:[0-9][0-9]:00\)/\1/'`
+   localhh=`echo $FILETIME | cut -d : -f 1 | sed -e 's/^0//'`
+   localmin=`echo $FILETIME | cut -d : -f 2 | sed -e 's/^0//'`
+   localtim=`printf "%02d%02d" $localhh $localmin`
+   localdow=`date -d $FILEDATE +%a`
+   localday=`date -d $FILEDATE +%-d`
+   localmon=`date -d $FILEDATE +%m`
+   localmon=`echo $localmon | sed -e 's/^0//'`
+   localyyyy=`date -d $FILEDATE +%Y`
+   localtimeid=`date -d $FILEDATE +%Z`
+   filehh=`date -u -d $FILETIME +%H | sed -e 's/^0//'`
+   filemin=`date -u -d $FILETIME +%M | sed -e 's/^0//'`
+   # Maybe someone will want these ...
+   # file_creat_hr=`ls -l --time-style="+%H" $ENV_NCL_FILENAME | cut -d " " -f 6`
+   # file_creat_mn=`ls -l --time-style="+%M" $ENV_NCL_FILENAME | cut -d " " -f 6`
+   fcsthr=`echo $FILETIME | sed -e 's/\([0-2][0-9]\):[0-9][0-9]:00/\1/' | sed -e 's/^0//'`
+   fcstmin=`echo $FILETIME | sed -e 's/[0-9][0-9]:\([0-9][0-9]\):.*/\1/'`
+   let fcstdely=${fcsthr}-${inithr}
+   if ( [[ $fcstdely -lt 0 ]] ) ; then
+     let fcstdely=${fcstdely}+24
+   fi
+   if ( [[ $fcstmin == "30" ]] ) ; then
+     fcsttail=".5"
+   else
+     fcsttail=""
+   fi
+   FCdelay=`printf "%d%s" ${fcstdely} ${fcsttail}`
+ 
+   # These cannot be filled in from a test script: In normal operation, rasp.pl supplies values
+   fcstperiodprt='42'
+   ztime='4321'
+ 
+   ENV_NCL_DATIME=`printf "Day= %s %s %s %s ValidLST= %02d%02d %s ValidZ= %02d%02d Fcst= %s Init= %s" \
+                   $localyyyy $localmon $localday $localdow \
+                   $localhh $localmin $localtimeid $filehh $filemin \
+                   $fcstperiodprt $fcstperiodprt`
+ 
+   ENV_NCL_ID=`printf "Valid %02d%02d %s ~Z75~(%02d%02dZ)~Z~ %s %s %s %d ~Z75~[%shrFcst from %02dZ data]~Z~" \
+               $localhh $localmin $localtimeid \
+               $filehh $filemin \
+               $localdow $localday $localmon $localyyyy \
+               $FCdelay $inithr`
+ 
+   if ( [ x${LOGDIR} != "x" ] ) ; then
+     LOGFILE=`printf "%s/%s.%02d%02d" $LOGDIR "replot" $localhh $localmin`
+     touch $LOGFILE
+   else
+      LOGFILE="/dev/stdout"
+   fi
+  
+   if ( ! `echo $HHMMLIST | grep $localtim > /dev/null` ) ; then
+     echo $localtim not in PLOT_HHMMLIST >> $LOGFILE
+     return
+   fi
+ 
+   echo "ENV_NCL_DATIME = $ENV_NCL_DATIME" >>  $LOGFILE
+   echo "ENV_NCL_ID = $ENV_NCL_ID"         >> $LOGFILE
+   export ENV_NCL_DATIME=$ENV_NCL_DATIME
+   export ENV_NCL_ID=$ENV_NCL_ID
+
+   cd $BASEDIR/GM ;
+   export ENV_NCL_FILENAME=$F;
+ 
+   # Finally!!
+   if ( [ x${LOGDIR} = "x" ] ) ; then
+      ncl -n -p $BASEDIR/GM/wrf2gm.ncl >> $LOGFILE
+   else
+      ncl -n -p $BASEDIR/GM/wrf2gm.ncl >> $LOGFILE &
+   fi
+}
+
+let Nfiles=`echo $WRFFILES | wc -w`
+let R=15
+let N=15
+for (( n=1; n<=$Nfiles; n=$n+$R ))
+do
+   for ENV_NCL_FILENAME in `echo $WRFFILES | cut -d " " -f $n-$N`
+   do
+      do_file
+   done
+   wait
+   let N=$N+$R
+done
+
+
