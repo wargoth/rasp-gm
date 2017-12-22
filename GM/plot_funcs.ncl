@@ -296,7 +296,7 @@ begin
         mn = min(mag4plot)
         mx = max(mag4plot)
 
-        opts = doColorLevels(wks, levels, mn, mx)
+        opts = doColorLevels(wks_temp, levels, mn, mx)
 	if(opts .eq. False) then
 		return(ldatafmt)
 	end if
@@ -475,7 +475,7 @@ begin
 		levels = 0
 	end if
 
-	opts = doColorLevels(wks, levels, mn, mx)
+	opts = doColorLevels(wks_temp, levels, mn, mx)
 	if(opts .eq. False) then
 		return(ldatafmt)
 	end if
@@ -808,7 +808,10 @@ begin
 	end if
 
 	span = 50  ; Span (Km) (+ve & -ve) of X-Section - Reduced if exceeds bounds
+	           ; or by load ... below
 	contourLines = "thetac"	; default - can be overridden by "load" below
+
+	load "rasp.site_load.xbl.ncl"
 
 	if(FMT .eq. "png") then
 		fName = OutDir + plot_param + tail
@@ -899,7 +902,6 @@ print("xmin = " + xmin + " xmax = " + xmax)
 	end if
 	opts_w@tiXAxisString  = "Distance [km]"   ; Label for the X axis
 
-	load "rasp.site_load.xbl.ncl"
 	var = contourLines
 	load "opts_xbl.ncl"
 
@@ -1462,13 +1464,19 @@ begin
 			end_time = systemfunc("date +%s")
 			duration = stringtoint(end_time) - stringtoint(start_time)
 			print("    Parameter " + params(p-1) + " took " + duration / 60 + ":" + duration % 60 + " mins")
-		print(" ")	; CR!
+			print(" ")	; CR!
 		end if
 		if( p .ge. dimsizes(params)) then
 			break
 		end if 
 
 		start_time = systemfunc("date +%s")
+
+; PFD_TOT
+		if(params(p) .eq. "pfd_tot") then
+			continue
+		end if
+
 		print("*** Doing parameter: " + params(p) + " at " + systemfunc("date"))
 
 		if(isvar("plot_param_chars")) then
@@ -1492,11 +1500,6 @@ begin
 		opts_bparam = True
 		opts_bparam@mult = 1.0	; Default value; overidden as required
 		ldatafmt = 0		; Overridden as required
-
-; PFD_TOT
-		if(params(p) .eq. "pfd_tot") then
-			continue
-		end if
 
 ; SOUNDING
 		if( dimsizes(plot_param_chars) .gt. 9 .and. plot_param_chars(0:7) .eq. "sounding") then
@@ -2766,18 +2769,19 @@ begin
 	opts_bparam@mult = 1.0	; Default value; overidden as required
 	ldatafmt = 0		; Overridden as required
 
+	print("*** Doing PFD")
 	opts_bparam@MainTitle = "Potential Flight Distance (Discus, 100 kg ball.)"
 	if( UNITS .eq. "american" ) then
 		opts_bparam@UnitLabel = "[mi]"
 		opts_bparam@unitString = "mi"
-		opts_bparam@ContourParameters = (/ 100., 500., 100. /)
-		qparaminfo = "Param= pfdtot Unit= mi Mult= 1"
+		opts_bparam@ContourParameters = (/ 100., 400., 100. /)
+		qparaminfo = "Param= pfd_tot Unit= mi Mult= 1"
 		opts_bparam@mult = 0.621371192237 ; Convert to miles
 	else
 		opts_bparam@UnitLabel = "[km]"
 		opts_bparam@unitString = "km"
 		opts_bparam@ContourParameters = (/ 100., 900., 100. /)
-		qparaminfo = "Param= pfdtot Unit= km Mult= 1"
+		qparaminfo = "Param= pfd_tot Unit= km Mult= 1"
 		opts_bparam@mult = 1.0
 	end if
 
@@ -2820,7 +2824,7 @@ begin
 	avgstars_mag = avgstars()
 
 	if(.not. isatt(avgstars_mag, "valid") .or. avgstars_mag@valid .ne. True)
-		print("*** PFD error: result not plotted!")
+		print("*** AVGstars error: result not plotted!")
 		return
 	end if
 

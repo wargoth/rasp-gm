@@ -12,7 +12,7 @@ end if
 ; blsectionztop = 6  ; Km  (if UNITS are "metric")
 
 ; Change horizontal extent of section 
-; span = 100 ; Km
+span = 20 ; Km
   
 ; Select Contour Lines overlay
 ; contourLines = "thetac" ; Potential Temp (default)

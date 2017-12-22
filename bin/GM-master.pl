@@ -978,45 +978,6 @@ $PROXY = "";
   $yymmdd{'curr+7.'} = "${jyr2p7}${jmo2p7}${jda2p7}";
   $julianyyyymmddprt{'curr+7.'} = "${jyr4p7}-${jmo2p7}-${jda2p7}";
 
-### SET CURRENT+8 JULIAN MONTH,DAY,YR
-    $juliandayp8 = $julianday + 8;
-    my ($jyr2p8);
-    jchomp( $string = `jdate2date $juliandayp8 $iyr2runday` );
-    ($jmo2p8, $jda2p8, $jyr2p8) = split ( m|/|, $string );
-    my $jyr4p8 = $jyr2p8 + 2000;
-    $validdow{'curr+8.'} = $dow[ &dayofweek( $jda2p8, $jmo2p8, $jyr4p8 ) ]; # uses Date::DayOfWeek
-    $validdateprt{'curr+8.'} = "${jmo2p8}/${jda2p8}";
-    $validmon{'curr+8.'} = $mon{$jmo2p8};
-    $validda1{'curr+8.'} = &strip_leading_zero( $jda2p8 );
-    $yymmdd{'curr+8.'} = "${jyr2p8}${jmo2p8}${jda2p8}";
-    $julianyyyymmddprt{'curr+8.'} = "${jyr4p8}-${jmo2p8}-${jda2p8}";
-
-### SET CURRENT+9 JULIAN MONTH,DAY,YR
-    $juliandayp9 = $julianday + 9;
-    my ($jyr2p9);
-    jchomp( $string = `jdate2date $juliandayp9 $iyr2runday` );
-    ($jmo2p9, $jda2p9, $jyr2p9) = split ( m|/|, $string );
-    my $jyr4p9 = $jyr2p9 + 2000;
-    $validdow{'curr+9.'} = $dow[ &dayofweek( $jda2p9, $jmo2p9, $jyr4p9 ) ]; # uses Date::DayOfWeek
-    $validdateprt{'curr+9.'} = "${jmo2p9}/${jda2p9}";
-    $validmon{'curr+9.'} = $mon{$jmo2p9};
-    $validda1{'curr+9.'} = &strip_leading_zero( $jda2p9 );
-    $yymmdd{'curr+9.'} = "${jyr2p9}${jmo2p9}${jda2p9}";
-    $julianyyyymmddprt{'curr+9.'} = "${jyr4p9}-${jmo2p9}-${jda2p9}";
-
-### SET CURRENT+10 JULIAN MONTH,DAY,YR
-    $juliandayp10 = $julianday + 10;
-    my ($jyr2p10);
-    jchomp( $string = `jdate2date $juliandayp10 $iyr2runday` );
-    ($jmo2p10, $jda2p10, $jyr2p10) = split ( m|/|, $string );
-    my $jyr4p10 = $jyr2p10 + 2000;
-    $validdow{'curr+10.'} = $dow[ &dayofweek( $jda2p10, $jmo2p10, $jyr4p10 ) ]; # uses Date::DayOfWeek
-    $validdateprt{'curr+10.'} = "${jmo2p10}/${jda2p10}";
-    $validmon{'curr+10.'} = $mon{$jmo2p10};
-    $validda1{'curr+10.'} = &strip_leading_zero( $jda2p10 );
-    $yymmdd{'curr+10.'} = "${jyr2p10}${jmo2p10}${jda2p10}";
-    $julianyyyymmddprt{'curr+10.'} = "${jyr4p10}-${jmo2p10}-${jda2p10}";
-
 ### CALL TO SET  FTP PARAMETERS
 ### but for NWS must later override directories since since depends on initialization time
   &setup_ftp_parameters;
@@ -1089,7 +1050,7 @@ $PROXY = "";
   }
   @filedolist = @editedfiledolist;
   ### this used for printing of summary times and again
-  @validdaylist = ( "curr.", "curr+1.", "curr+2.", "curr+3.", "curr+4.", "curr+5.", "curr+6", "curr+7", "curr+8", "curr+9" );
+  @validdaylist = ( "curr.", "curr+1.", "curr+2.", "curr+3.", "curr+4.", "curr+5.", "curr+6" );
 ### START OF SET FILENAME ANAL/FCST/VALID TIME ARRAYS
   $avgextendedvalidtime = 0 ; 
   $nfiles = 0 ; 
@@ -1217,18 +1178,6 @@ $PROXY = "";
     elsif ( $validtime <= 167 ) {
       $filevaliddays{$ifile} = 'curr+6.';
       $filevalidtime = $validtime - 144;
-    }
-    elsif ($validtime <= 8 * 24 - 1) {
-        $filevaliddays{$ifile} = 'curr+7.';
-        $filevalidtime = $validtime - 7 * 24;
-    }
-    elsif ($validtime <= 9 * 24 - 1) {
-        $filevaliddays{$ifile} = 'curr+8.';
-        $filevalidtime = $validtime - 8 * 24;
-    }
-    elsif ($validtime <= 10 * 24 - 1) {
-        $filevaliddays{$ifile} = 'curr+9.';
-        $filevalidtime = $validtime - 9 * 24;
     }
     else {
       print $PRINTFH "BLIP ERROR EXIT: bad filevalidtime= $filevalidtime\n";
@@ -1606,18 +1555,6 @@ $PROXY = "";
                 $grib_yyyymmddhh = sprintf "%4d%02d%02d%02d",${jyr4p6},${jmo2p6},${jda2p6},${filevalidtime};
                 $yesterday_grib_yyyymmddhh = sprintf "%4d-%02d-%02d_%02d",${jyr4p5},${jmo2p5},${jda2p5},${filevalidtime};
         }
-        elsif ($filevaliddays{$ifile} eq 'curr+7.') {
-            $grib_yyyymmddhh = sprintf "%4d%02d%02d%02d", ${jyr4p7}, ${jmo2p7}, ${jda2p7}, ${filevalidtime};
-            $yesterday_grib_yyyymmddhh = sprintf "%4d-%02d-%02d_%02d", ${jyr4p6}, ${jmo2p6}, ${jda2p6}, ${filevalidtime};
-        }
-        elsif ($filevaliddays{$ifile} eq 'curr+8.') {
-            $grib_yyyymmddhh = sprintf "%4d%02d%02d%02d", ${jyr4p8}, ${jmo2p8}, ${jda2p8}, ${filevalidtime};
-            $yesterday_grib_yyyymmddhh = sprintf "%4d-%02d-%02d_%02d", ${jyr4p7}, ${jmo2p7}, ${jda2p7}, ${filevalidtime};
-        }
-        elsif ($filevaliddays{$ifile} eq 'curr+9.') {
-            $grib_yyyymmddhh = sprintf "%4d%02d%02d%02d", ${jyr4p9}, ${jmo2p9}, ${jda2p9}, ${filevalidtime};
-            $yesterday_grib_yyyymmddhh = sprintf "%4d-%02d-%02d_%02d", ${jyr4p8}, ${jmo2p8}, ${jda2p8}, ${filevalidtime};
-        }
         else {
           print $PRINTFH "$program ERROR EXIT - grib_yyyymmddhh bad filevaliddays =  $ifile $filevaliddays{$ifile} "; exit 1;
         }
@@ -1827,21 +1764,6 @@ $PROXY = "";
                   $startmm4dom[1] = $jmo2p6;
                   $startdd4dom[1] = $jda2p6;
                 }
-                elsif ($startvalidday eq 'curr+7.') {
-                    $startyyyy4dom[1] = $jyr4p7;
-                    $startmm4dom[1] = $jmo2p7;
-                    $startdd4dom[1] = $jda2p7;
-                }
-                elsif ($startvalidday eq 'curr+8.') {
-                    $startyyyy4dom[1] = $jyr4p8;
-                    $startmm4dom[1] = $jmo2p8;
-                    $startdd4dom[1] = $jda2p8;
-                }
-                elsif ($startvalidday eq 'curr+9.') {
-                    $startyyyy4dom[1] = $jyr4p9;
-                    $startmm4dom[1] = $jmo2p9;
-                    $startdd4dom[1] = $jda2p9;
-                }
                 else {
                   print $PRINTFH "*** ERROR EXIT - start day not valid: $IWINDOW $startvalidday ";
                   exit 1;
@@ -1883,21 +1805,6 @@ $PROXY = "";
                   $startyyyy4dom[1] = $jyr4p7;
                   $startmm4dom[1] = $jmo2p7;
                   $startdd4dom[1] = $jda2p7;
-                }
-                elsif ($startvalidday eq 'curr+7.') {
-                    $startyyyy4dom[1] = $jyr4p8;
-                    $startmm4dom[1] = $jmo2p8;
-                    $startdd4dom[1] = $jda2p8;
-                }
-                elsif ($startvalidday eq 'curr+8.') {
-                    $startyyyy4dom[1] = $jyr4p9;
-                    $startmm4dom[1] = $jmo2p9;
-                    $startdd4dom[1] = $jda2p9;
-                }
-                elsif ($startvalidday eq 'curr+9.') {
-                    $startyyyy4dom[1] = $jyr4p10;
-                    $startmm4dom[1] = $jmo2p10;
-                    $startdd4dom[1] = $jda2p10;
                 }
                 else {
                   print $PRINTFH "*** ERROR EXIT - window start day not valid: $IWINDOW $startvalidday ";
@@ -2419,9 +2326,6 @@ $PROXY = "";
           elsif( $JOBARG =~ m|\+4| )  { $testday = 'curr+4.'; }
           elsif( $JOBARG =~ m|\+5| )  { $testday = 'curr+5.'; }
           elsif( $JOBARG =~ m|\+6| )  { $testday = 'curr+6.'; }
-          elsif ($JOBARG =~ m|\+7| )  { $testday = 'curr+7.'; }
-          elsif ($JOBARG =~ m|\+8| )  { $testday = 'curr+8.'; }
-          elsif ($JOBARG =~ m|\+9| )  { $testday = 'curr+9.'; }
           else                        { $testday = 'curr.';   }
         }
         ### use output directory so not influenced by LSEND,LSAVE flags
@@ -2750,6 +2654,18 @@ sub output_model_results_hhmm ()
       #   ($domainid, $kdomain) = &output_wrffile_results ( $wrffile );
       # }
     }
+  }
+
+  # Need to run ncl for pfd_tot and/or avgstars
+  our ($avg_flag, $pfd_flag);
+  if($pfd_flag){   # Need all this for avg_flag - if anyone wants it!
+    # Other ENV_NCL_... will be left over :-)
+    $ENV{'ENV_NCL_PARAMS'} = "pfd_tot";
+    my $logfile = "$RUNDIR/LOG/ncl.out.0${kdomain}.pfd" ;
+    $time = `date +%H:%M:%S`;
+    print $PRINTFH "     Plotting parameter \"pfd_tot\" at $time \n";
+
+    `cd $NCLDIR ; ncl -n -p < wrf2gm.ncl > $logfile 2>&1` ;
   }
 
   # When the NCL procs have successfully finished, Copy files to website, etc
@@ -3086,7 +3002,8 @@ sub chk_not_too_long()
 }
 
 my %ncl_procs;  # Empty Associative Array; Must be a Global
-
+our $pfd_flag = 0;
+our $avg_flag = 0;
 
 sub output_wrffile_results (@)
 ### CREATE WRF PLOTS FOR WRF FILES , DO FTPING + SAVE FOR SINGLE OUTPUT TIME
@@ -3160,10 +3077,6 @@ sub output_wrffile_results (@)
       elsif( $JOBARG =~ m|\+4| )  { $localsoarday = 'curr+4.'; }
       elsif( $JOBARG =~ m|\+5| )  { $localsoarday = 'curr+5.'; }
       elsif( $JOBARG =~ m|\+6| )  { $localsoarday = 'curr+6.'; }
-      elsif ($JOBARG =~ m|\+7| )  { $localsoarday = 'curr+7.'; }
-      elsif ($JOBARG =~ m|\+8| )  { $localsoarday = 'curr+8.'; }
-      elsif ($JOBARG =~ m|\+9| )  { $localsoarday = 'curr+9.'; }
-      
       else                        { $localsoarday = 'curr.';   }
     }
     $postday = $localsoarday ;    
@@ -3178,10 +3091,22 @@ sub output_wrffile_results (@)
                                  $localyyyy,$localmm,$localdd,$localdow,
                                  $localhh,$localmin,$LOCALTIME_ID{$regionkey},
                                  $filehh,$filemin, $fcstperiod, $gribfcstperiod ; 
-    ### set parameter list sent to wrf2gm.ncl
-    $ENV{'ENV_NCL_PARAMS'} = sprintf "%s", ( join ':',@{$PARAMETER_DOLIST{$regionkey}} )  ;
 
-    ### run ncl for this file to create individual ncgm files
+    ### Set parameter list sent to wrf2gm.ncl
+	# Complication with pfd_tot & avg_stars
+	# as these must be run once only, when _all_ data files are available.
+	# Thus these params must be removed from list
+	# And then run after main run
+	
+	my @ncl_params = ();
+	our ($pfd_flag, $avg_flag);
+	foreach my $P (@{$PARAMETER_DOLIST{$regionkey}}) {
+      if($P eq "pfd_tot")     { $pfd_flag = 1;}
+      elsif($P eq "avgstars") { $avg_flag = 1;}
+      else                    { push @ncl_params, $P; }
+    }
+    $ENV{'ENV_NCL_PARAMS'} = sprintf "%s", ( join ':',@ncl_params );
+
     $paramiddatastring = '' ;
     for ($iimage=0; $iimage<=$#{$PARAMETER_DOLIST{$regionkey}}; $iimage++ ) {
       $paramiddatastring .= "$PARAMETER_DOLIST{$regionkey}[$iimage] " ;

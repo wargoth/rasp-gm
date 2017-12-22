@@ -1,0 +1,4 @@
+#!/bin/bash
+FILE=`pwd`/$1
+cd $BASEDIR/bin/PanoplyJ
+./panoply.sh $FILE

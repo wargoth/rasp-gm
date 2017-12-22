@@ -89,6 +89,7 @@ begin
 			opts_cn@cnFillColors = 0
 		end if
 		opts_cn@gsnSpreadColors = False
+
 		return(opts_cn)
 	end if
 
