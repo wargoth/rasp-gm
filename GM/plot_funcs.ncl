@@ -1187,7 +1187,7 @@ begin
 		if(UNITS .ne. "metric") then
 			qdatatitle = opts_bparam@MainTitle + " Speed [kt] " + getenv("ENV_NCL_ID")
 			qparaminfo = "Param= " + param + " Speed Unit= kt Mult= 1"
-			press_wspd = press_wspd / 1.9438445
+			press_wspd = press_wspd * 1.9438445
 		else
 			qdatatitle = opts_bparam@MainTitle + " Speed [m/sec] " + getenv("ENV_NCL_ID")
 			qparaminfo = "Param= " + param + "Speed Unit= m/s Mult= 1"
