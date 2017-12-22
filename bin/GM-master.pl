@@ -2752,6 +2752,18 @@ sub output_model_results_hhmm ()
     }
   }
 
+  # Need to run ncl for pfd_tot and/or avgstars
+  our ($avg_flag, $pfd_flag);
+  if($pfd_flag){   # Need all this for avg_flag - if anyone wants it!
+    # Other ENV_NCL_... will be left over :-)
+    $ENV{'ENV_NCL_PARAMS'} = "pfd_tot";
+    my $logfile = "$RUNDIR/LOG/ncl.out.0${kdomain}.pfd" ;
+    $time = `date +%H:%M:%S`;
+    print $PRINTFH "     Plotting parameter \"pfd_tot\" at $time \n";
+
+    `cd $NCLDIR ; ncl -n -p < wrf2gm.ncl > $logfile 2>&1` ;
+  }
+
   # When the NCL procs have successfully finished, Copy files to website, etc
   if( $LSEND == 0 ) {
     print $PRINTFH "LSEND == $LSEND; Not sending files to Website\n" ;
@@ -3086,7 +3098,8 @@ sub chk_not_too_long()
 }
 
 my %ncl_procs;  # Empty Associative Array; Must be a Global
-
+our $pfd_flag = 0;
+our $avg_flag = 0;
 
 sub output_wrffile_results (@)
 ### CREATE WRF PLOTS FOR WRF FILES , DO FTPING + SAVE FOR SINGLE OUTPUT TIME
@@ -3163,7 +3176,7 @@ sub output_wrffile_results (@)
       elsif ($JOBARG =~ m|\+7| )  { $localsoarday = 'curr+7.'; }
       elsif ($JOBARG =~ m|\+8| )  { $localsoarday = 'curr+8.'; }
       elsif ($JOBARG =~ m|\+9| )  { $localsoarday = 'curr+9.'; }
-      
+
       else                        { $localsoarday = 'curr.';   }
     }
     $postday = $localsoarday ;    
@@ -3178,10 +3191,22 @@ sub output_wrffile_results (@)
                                  $localyyyy,$localmm,$localdd,$localdow,
                                  $localhh,$localmin,$LOCALTIME_ID{$regionkey},
                                  $filehh,$filemin, $fcstperiod, $gribfcstperiod ; 
-    ### set parameter list sent to wrf2gm.ncl
-    $ENV{'ENV_NCL_PARAMS'} = sprintf "%s", ( join ':',@{$PARAMETER_DOLIST{$regionkey}} )  ;
 
-    ### run ncl for this file to create individual ncgm files
+    ### Set parameter list sent to wrf2gm.ncl
+	# Complication with pfd_tot & avg_stars
+	# as these must be run once only, when _all_ data files are available.
+	# Thus these params must be removed from list
+	# And then run after main run
+	
+	my @ncl_params = ();
+	our ($pfd_flag, $avg_flag);
+	foreach my $P (@{$PARAMETER_DOLIST{$regionkey}}) {
+      if($P eq "pfd_tot")     { $pfd_flag = 1;}
+      elsif($P eq "avgstars") { $avg_flag = 1;}
+      else                    { push @ncl_params, $P; }
+    }
+    $ENV{'ENV_NCL_PARAMS'} = sprintf "%s", ( join ':',@ncl_params );
+
     $paramiddatastring = '' ;
     for ($iimage=0; $iimage<=$#{$PARAMETER_DOLIST{$regionkey}}; $iimage++ ) {
       $paramiddatastring .= "$PARAMETER_DOLIST{$regionkey}[$iimage] " ;

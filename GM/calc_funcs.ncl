@@ -385,40 +385,31 @@ begin
     filename_chars = stringtochar(getenv("ENV_NCL_FILENAME"))
     len_filename = dimsizes(filename_chars)-2
     datepart = chartostring(filename_chars(len_filename-18:len_filename-9))
+    dateStr = str_split(datepart, "-")
+    newdateStr = dateStr(0) + " " + toint(dateStr(1)) + " " + toint(dateStr(2))
 
-    cmd = "ls -l --time-style=+%F " + BaseDir + "/" + Region + "/OUT/wstar.*00lst.d2.data | grep " + datepart
+    cmd = "grep -l '" + newdateStr + "' " + BaseDir + "/" + Region + "/OUT/wstar.*00lst.d2.data"
     wstar_files = systemfunc(cmd)
     nfiles = dimsizes(wstar_files)
     delete(cmd)
 
     ; Read one file and extract nx & ny
     ; Should be the same as in ENV_NCL_FILENAME but ...
-    n = string_pattern_grep(wstar_files(0), " ")
-    f = extract_string_field(wstar_files(0), n+1, " ") ; filename only - note "ls -l" above!
+    f = wstar_files(0)
+    if(.not. fileexists(f) ) then
+        print(f + " does not exist!");
+        return(0)   ; pfdtot@valid is false!
+    end if
     hdr = readAsciiHead(f, "Day")
-    nx = stringtointeger(extract_string_field(hdr(2), 11, " "))
-    ny = stringtointeger(extract_string_field(hdr(2), 13, " "))
+    nx = toint(extract_string_field(hdr(2), 11, " "))
+    ny = toint(extract_string_field(hdr(2), 13, " "))
 
     pfdtot = new( (/ny,nx/), float)
     pfdtot = 0.0
     do i = 0, nfiles-2 ; Note: last file (i.e. for latest time) not included
-        F = wstar_files(i)
-        n = string_pattern_grep(F, " ")
-        f = extract_string_field(F, n+1, " ") ; full filename only - note "ls -l" above!
+        f = wstar_files(i)
         ; print("i = " + i + " f = " + f)
 
-        ; Confirm that file 1-hour ahead exists
-        filename_chars = stringtochar(f)
-        len = dimsizes(filename_chars)-2
-        timeint = stringtoint(chartostring(filename_chars(len-14:len-11)))
-        nextfiletime = timeint + 100
-        nextfilename = filename_chars(0:(len-15)) + sprinti("%04d", nextfiletime) + filename_chars(len-10:len)
-        ; print(nextfilename)
-        if( .not. fileexists(nextfilename))
-            print("*** PFD Error: " + nextfilename + " is missing")
-            return(pfdtot)  ; NB: pfdtot@valid is NOT True
-        end if
-    
         wstar = readAsciiTable(f, nx, "integer", 4)
         if(UNITS .eq. "metric")
             wssel = wstar / 100.0 - 1.15 ; Convert from cm/sec & Deduct sink rate
@@ -431,7 +422,6 @@ begin
                /-0.000302016415111608))))/2
         pfdtot = pfdtot + dist
         delete( (/wstar, wssel/) )
-        ; print(max(pfdtot))
     end do  
 
     pfdtot@valid = True
