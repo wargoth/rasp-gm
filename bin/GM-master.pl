@@ -2072,7 +2072,7 @@ $PROXY = "";
 
               if ( $LMODELRUN>1 && -f "LOG/wrf.out"  ) {
                 if ($LPRINT>2) { print $PRINTFH "      Previous wrf.out file pre-pended with \"previous.\" \n"; }
-                `mv -f wrf.out previous.wrf.out 2>/dev/null`;
+                `mv -f LOG/wrf.out LOG/previous.wrf.out 2>/dev/null`;
               }
 
               #
@@ -2148,7 +2148,7 @@ $PROXY = "";
 #             `cd $WRFBASEDIR/WRFV2/RASP/$moad/ ; cp namelist.input wrf.namelist`;
               ### add ${JOBARG}:${regionkey} as argument so ps can differentiate jobs, but not used by executable
               ### must send wrf.exe stderr somewhere as otherwise 'drjack.info -- rsl_nproc_all 1, rsl_myproc 0' is written to this program's stderr !?
-              $wrfexe_errout = `wrf.exe "${JOBARG}:${regionkey}" >| wrf.out 2>&1`;
+              $wrfexe_errout = `wrf.exe "${JOBARG}:${regionkey}" >| LOG/wrf.out 2>&1`;
 
               ### Test for run errors
               ### note: "exceeded cfl" error can produce a NaN which kills execution so badly that these tests not reached:
@@ -2156,14 +2156,14 @@ $PROXY = "";
               $lrunerr = $?;
               $lastoserr = $!;
               ### must test for errors in log file since fatals still return code of 0
-              chomp( $successtest = `tail -1 wrf.out | grep -c -i 'SUCCESS COMPLETE'` ) ;
+              chomp( $successtest = `tail -1 LOG/wrf.out | grep -c -i 'SUCCESS COMPLETE'` ) ;
               if( $lrunerr != 0 || ! defined $successtest || $successtest eq '' ||  $successtest != 1 ) {
                 if ( $wrfexe_errout !~ m|^\s*$| ) {
                   print $PRINTFH "*** $moad ERROR EXIT : WRF.EXE => error found in STDERR = $wrfexe_errout \n";
                   exit 1;
                 }
                 elsif ( ! defined $successtest || $successtest eq '' || $successtest != 1 ) {
-                  &write_err( "*** $moad ERROR: WRF.EXE EXIT ERROR: successtest= ${successtest} !=1 => error reported in logfile wrf.out");
+                  &write_err( "*** $moad ERROR: WRF.EXE EXIT ERROR: successtest= ${successtest} !=1 => error reported in logfile LOG/wrf.out");
                 }
                 elsif( $lrunerr != 0 ) { 
                   &write_err( "*** $moad ERROR: WRF.EXE EXIT ERROR: non-zero ReturnCode = ${lrunerr} - lastOSerr=${lastoserr} \n");

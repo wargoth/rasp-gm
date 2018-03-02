@@ -33,3 +33,8 @@ if( plot_param .eq. "wstar" ) then
   opts_bparam@ContourParameters = (/ 175., 575., 25. /)
 end if
 
+
+if( plot_param .eq. "wblmaxmin" ) then
+    opts_bparam@ContourParameters = (/ -250., 250., 50. /)
+end if
+
