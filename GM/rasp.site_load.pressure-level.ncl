@@ -11,15 +11,15 @@ else
 end if
 
 
-if(    (plot_param .eq. "press850")   )
+;if(    (plot_param .eq. "press850")   )
 ;if(    (plot_param .eq. "sfcwind")   \
 ;  .or. (plot_param .eq. "bltopwind") \
 ;  .or. (plot_param .eq. "blwind")    \
 ;  .or. (plot_param .eq. "blwindshear" ) )
 
-       opts_bparam@colorMap = "BlueDarkRed18" ; "pgwind"
+;       opts_bparam@colorMap = "BlueDarkRed18" ; "pgwind"
 ;       ; NB: #colours in colorMap file must be >=  #steps
 
 ;       opts_bparam@ContourParameters = (/ 15., 255., 15. /);
-end if
+;end if
 

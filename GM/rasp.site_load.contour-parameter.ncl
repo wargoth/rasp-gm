@@ -33,6 +33,6 @@ if( plot_param .eq. "wstar" ) then
   opts_bparam@ContourParameters = (/ 175., 575., 25. /)
 end if
 
-if(plot_param .eq. "wblmaxmin") then
-       opts_bparam@colorMap = "BlueDarkRed18" ; "pgwind"
-end if
+; if(plot_param .eq. "wblmaxmin") then
+;        opts_bparam@colorMap = "BlueDarkRed18" ; "pgwind"
+; end if

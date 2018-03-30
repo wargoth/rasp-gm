@@ -1,7 +1,7 @@
 ; PART OF plot_parameter() - See plot_param.ncl
 ; Put in separate file for readability
 ;
-; http://www.mmm.ucar.edu/wrf/users/docs/user_guide_V3/users_guide_chap5.htm#fields
+; http://www2.mmm.ucar.edu/wrf/users/docs/user_guide_V3/users_guide_chap5.htm#fields
 ; Shows what is available
 ; "ncdump - h <wrfout_file> shows what's actually there 
 

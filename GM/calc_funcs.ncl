@@ -377,6 +377,208 @@ end
 ;
 ; PDFTOT
 ;
+function pfd3()
+begin
+    ; Uses only data files
+    ; Must select files with correct date and on full hours (i.e. minutes == 00lst)
+
+    filename_chars = stringtochar(getenv("ENV_NCL_FILENAME"))
+    len_filename = dimsizes(filename_chars)-2
+    datepart = chartostring(filename_chars(len_filename-18:len_filename-9))
+    dateTmp = str_split(datepart, "-")
+    dateStr = dateTmp(0) + " " + toint(dateTmp(1)) + " " + toint(dateTmp(2))
+    delete(dateTmp)
+
+    cmd = "grep -l '" + dateStr + "' " + BaseDir + "/" + Region + "/OUT/wstar.*00lst.d2.data"
+    wstar_files = systemfunc(cmd)
+    nfiles = dimsizes(wstar_files)
+
+    cmd = "grep -l '" + dateStr + "' " + BaseDir + "/" + Region + "/OUT/dwcrit.curr.*00lst.d2.data"
+    dwcrit_files = systemfunc(cmd)
+
+    cmd = "grep -l '" + dateStr + "' " + BaseDir + "/" + Region + "/OUT/zsfclcldif.curr.*00lst.d2.data"
+    pot_files = systemfunc(cmd)
+
+    delete(cmd)
+
+    ; Read one file and extract nx & ny
+    ; Should be the same as in ENV_NCL_FILENAME but ...
+    f = wstar_files(0)
+    if(.not. fileexists(f) ) then
+        print(f + " does not exist!");
+        return(0)   ; pfdtot@valid is false!
+    end if
+    hdr = readAsciiHead(f, "Day")
+    nx = toint(extract_string_field(hdr(2), 11, " "))
+    ny = toint(extract_string_field(hdr(2), 13, " "))
+
+    pfdtot = new( (/ny,nx/), float)
+    pfdtot = 0.0
+    do i = 0, nfiles-2 ; Note: last file (i.e. for latest time) not included
+        ; print("i = " + i + " f = " + f)
+        f_W = wstar_files(i)
+        f_D = dwcrit_files(i)
+        f_P = pot_files(i)
+
+        wstar  = readAsciiTable(f_W, nx, "integer", 4)
+        depth  = readAsciiTable(f_D, nx, "integer", 4)
+        cu_pot = readAsciiTable(f_P, nx, "integer", 4)
+
+	; Make wstar zero if dwcrit < 900m (== 2953ft)
+ 	; And cu_pot < 0 (=> blue thermals)
+
+        if(UNITS .eq. "metric")
+	    wstar = where((depth .lt. 900 .and. cu_pot .lt. 0), 0, wstar)
+            wssel = wstar / 100.0 - 1.15 ; Convert from cm/sec & Deduct sink rate
+        else
+	    wstar = where((depth .lt. 2953 .and. cu_pot .lt. 0), 0, wstar)
+            wssel = (wstar / 196.85039) - 1.15 ; But first convert to m/sec
+        end if
+        wssel = wssel > 0.0
+        dist = ((wssel*(sqrt((-5.21488508245734-wssel)/-0.000302016415111608))) \
+               /(2*wssel-2*-5.21488508245734-0.0729181700942301*(sqrt((-5.21488508245734-wssel)\
+               /-0.000302016415111608))))/2
+
+
+        pfdtot = pfdtot + dist
+        delete( (/wstar, wssel, depth, cu_pot/) )
+    end do  
+
+    pfdtot@valid = True
+    return(pfdtot)
+end
+
+function pfd2()
+begin
+    ; Uses only data files
+    ; Must select files with correct date and on full hours (i.e. minutes == 00lst)
+
+    filename_chars = stringtochar(getenv("ENV_NCL_FILENAME"))
+    len_filename = dimsizes(filename_chars)-2
+    datepart = chartostring(filename_chars(len_filename-18:len_filename-9))
+    dateTmp = str_split(datepart, "-")
+    dateStr = dateTmp(0) + " " + toint(dateTmp(1)) + " " + toint(dateTmp(2))
+    delete(dateTmp)
+
+    cmd = "grep -l '" + dateStr + "' " + BaseDir + "/" + Region + "/OUT/wstar.*00lst.d2.data"
+    wstar_files = systemfunc(cmd)
+    nfiles = dimsizes(wstar_files)
+
+    cmd = "grep -l '" + dateStr + "' " + BaseDir + "/" + Region + "/OUT/zsfclcl.curr.*00lst.d2.data"
+    cldbase_files = systemfunc(cmd)
+
+    delete(cmd)
+
+    ; Read one file and extract nx & ny
+    ; Should be the same as in ENV_NCL_FILENAME but ...
+    f = wstar_files(0)
+    if(.not. fileexists(f) ) then
+        print(f + " does not exist!");
+        return(0)   ; pfdtot@valid is false!
+    end if
+    hdr = readAsciiHead(f, "Day")
+    nx = toint(extract_string_field(hdr(2), 11, " "))
+    ny = toint(extract_string_field(hdr(2), 13, " "))
+
+    pfdtot = new( (/ny,nx/), float)
+    pfdtot = 0.0
+    do i = 0, nfiles-2 ; Note: last file (i.e. for latest time) not included
+        ; print("i = " + i + " f = " + f)
+        f_W = wstar_files(i)
+        f_C = cldbase_files(i)
+
+        wstar = readAsciiTable(f_W, nx, "integer", 4)
+        cldbase = readAsciiTable(f_C, nx, "integer", 4)
+
+	; Make wstar zero if cloudbase < 700m (== 2300ft)
+
+        if(UNITS .eq. "metric")
+	    wstar = where(cldbase .lt. 700, 0, wstar)
+            wssel = wstar / 100.0 - 1.15 ; Convert from cm/sec & Deduct sink rate
+        else
+	    wstar = where(cldbase .lt. 2300, 0, wstar)
+            wssel = (wstar / 196.85039) - 1.15 ; But first convert to m/sec
+        end if
+        wssel = wssel > 0.0
+        dist = ((wssel*(sqrt((-5.21488508245734-wssel)/-0.000302016415111608))) \
+               /(2*wssel-2*-5.21488508245734-0.0729181700942301*(sqrt((-5.21488508245734-wssel)\
+               /-0.000302016415111608))))/2
+
+
+        pfdtot = pfdtot + dist
+        delete( (/wstar, wssel, cldbase/) )
+    end do  
+
+    pfdtot@valid = True
+    return(pfdtot)
+end
+
+function pfd1()
+begin
+    ; Uses only data files
+    ; Must select files with correct date and on full hours (i.e. minutes == 00lst)
+
+    filename_chars = stringtochar(getenv("ENV_NCL_FILENAME"))
+    len_filename = dimsizes(filename_chars)-2
+    datepart = chartostring(filename_chars(len_filename-18:len_filename-9))
+    dateTmp = str_split(datepart, "-")
+    dateStr = dateTmp(0) + " " + toint(dateTmp(1)) + " " + toint(dateTmp(2))
+    delete(dateTmp)
+
+    cmd = "grep -l '" + dateStr + "' " + BaseDir + "/" + Region + "/OUT/wstar.*00lst.d2.data"
+    wstar_files = systemfunc(cmd)
+    nfiles = dimsizes(wstar_files)
+
+    cmd = "grep -l '" + dateStr + "' " + BaseDir + "/" + Region + "/OUT/blcloudpct.curr.*00lst.d2.data"
+    cloud_files = systemfunc(cmd)
+
+    delete(cmd)
+
+    ; Read one file and extract nx & ny
+    ; Should be the same as in ENV_NCL_FILENAME but ...
+    f = wstar_files(0)
+    if(.not. fileexists(f) ) then
+        print(f + " does not exist!");
+        return(0)   ; pfdtot@valid is false!
+    end if
+    hdr = readAsciiHead(f, "Day")
+    nx = toint(extract_string_field(hdr(2), 11, " "))
+    ny = toint(extract_string_field(hdr(2), 13, " "))
+
+    pfdtot = new( (/ny,nx/), float)
+    pfdtot = 0.0
+    do i = 0, nfiles-2 ; Note: last file (i.e. for latest time) not included
+        ; print("i = " + i + " f = " + f)
+        f_W = wstar_files(i)
+        f_C = cloud_files(i)
+
+        wstar = readAsciiTable(f_W, nx, "integer", 4)
+        cloud = readAsciiTable(f_C, nx, "integer", 4)
+        if(UNITS .eq. "metric")
+            wssel = wstar / 100.0 - 1.15 ; Convert from cm/sec & Deduct sink rate
+        else
+            wssel = (wstar / 196.85039) - 1.15 ; But first convert to m/sec
+        end if
+        wssel = wssel > 0.0
+        dist = ((wssel*(sqrt((-5.21488508245734-wssel)/-0.000302016415111608))) \
+               /(2*wssel-2*-5.21488508245734-0.0729181700942301*(sqrt((-5.21488508245734-wssel)\
+               /-0.000302016415111608))))/2
+
+	; Adjust dist so every 1/8 cloud cover above 4/8 reduces distance by 25%
+	tmp = where(cloud .lt. 50, 50, cloud)   ; now 50 - 100
+	adj = 2 - 0.02 * tmp
+	dist = dist * adj
+
+
+        pfdtot = pfdtot + dist
+        delete( (/wstar, wssel, cloud, adj/) )
+    end do  
+
+    pfdtot@valid = True
+    return(pfdtot)
+end
+
+
 function pfd()
 begin
     ; Uses only data files
