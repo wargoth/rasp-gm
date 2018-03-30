@@ -532,13 +532,17 @@ sub jchomp(@)
 ### USE JOBARG TO CREATE griddolist
 ### READ PARAMETERS FROM EXTERNAL FILE IF IT EXISTS
   if ( -s "rasp.run.parameters.${JOBARG}" ) { 
-    $externalrunparamsfile = "rasp.run.parameters.${JOBARG}" ;
+    $externalrunparamsfile = "${RUNDIR}/rasp.run.parameters.${JOBARG}" ;
     ### PREVENT PERL WARNINGS from certain parameters set in rasp.run.parameters... file
     %SAVE_PLOT_HHMMLIST = %PLOT_IMAGE_SIZE = ();
     require $externalrunparamsfile  ;
   }
   else {
     print $PRINTFH "ERROR EXIT: no rasp run parameters file found for $JOBARG\n"; exit 1;
+  }
+  if(defined $LOCALTIME_ID){
+    print( $PRINTFH "WARNING: Setting LOCALTIME_ID & LOCALTIME_ADJ in $externalrunparamsfile is Futile!\n");
+    print( $PRINTFH "         LOCALTIME_ID & LOCALTIME_ADJ are now set automatically\n");
   }
   ##########  PARAMETER ALTERATIONS  ##########
   ### SET WINDOW LOOP LIMITS BASED ON $LRUN_WINDOW
@@ -766,7 +770,7 @@ $PROXY = "";
 
 ###### FINALLY, IF SITE PARAMETER FILE EXISTS THEN ALTER PARAMETERS SET ABOVE
   if ( -s "rasp.site.parameters" ) { 
-    $externalsitefile = "rasp.site.parameters" ;
+    $externalsitefile = "${RUNDIR}/rasp.site.parameters" ;
     require $externalsitefile  ;
   }
 
@@ -877,6 +881,9 @@ $PROXY = "";
   $juliandayprt = "${validdow{'curr.'}} ${jda2} ${mon{$jmo2}} ${jyr4}";
   $julianyyyymmddprt{'curr.'} = "${jyr4}-${jmo2}-${jda2}";
   $julianyyyymmddprt{''} = $julianyyyymmddprt{'curr.'} ;
+  $datetim = $julianyyyymmddprt{'curr.'} . " 12:00:00";
+  $LOCALTIME_ID{$regionkey}  = substr `date -d $datetim +%Z `,0,3;
+  $LOCALTIME_ADJ{$regionkey} = substr `date -d $datetim +%z `,0,3;
 ### NOW SET "RUNDAY" BASED ON JULIANDAY (SO ALTERED BY ANY ALTERATIONS TO IT)
   my $yymmddrunday = $yymmdd{''};
   $rundayprt = $juliandayprt;
@@ -899,6 +906,9 @@ $PROXY = "";
   $validda1{'curr+1.'} = &strip_leading_zero( $jda2p1 ); 
   $yymmdd{'curr+1.'} = "${jyr2p1}${jmo2p1}${jda2p1}";
   $julianyyyymmddprt{'curr+1.'} = "${jyr4p1}-${jmo2p1}-${jda2p1}";
+  $datetim = $julianyyyymmddprt{'curr+1.'} . " 12:00:00";
+  $LOCALTIME_ID{$regionkey}  = substr `date -d $datetim +%Z `,0,3;
+  $LOCALTIME_ADJ{$regionkey} = substr `date -d $datetim +%z `,0,3;
 
 ### SET CURRENT+2 JULIAN MONTH,DAY,YR
   $juliandayp2 = $julianday + 2;
@@ -912,6 +922,9 @@ $PROXY = "";
   $validda1{'curr+2.'} = &strip_leading_zero( $jda2p2 ); 
   $yymmdd{'curr+2.'} = "${jyr2p2}${jmo2p2}${jda2p2}";
   $julianyyyymmddprt{'curr+2.'} = "${jyr4p2}-${jmo2p2}-${jda2p2}";
+  $datetim = $julianyyyymmddprt{'curr+2.'} . " 12:00:00";
+  $LOCALTIME_ID{$regionkey}  = substr `date -d $datetim +%Z `,0,3;
+  $LOCALTIME_ADJ{$regionkey} = substr `date -d $datetim +%z `,0,3;
 
 ### SET CURRENT+3 JULIAN MONTH,DAY,YR
   $juliandayp3 = $julianday + 3;
@@ -925,6 +938,9 @@ $PROXY = "";
   $validda1{'curr+3.'} = &strip_leading_zero( $jda2p3 ); 
   $yymmdd{'curr+3.'} = "${jyr2p3}${jmo2p3}${jda2p3}";
   $julianyyyymmddprt{'curr+3.'} = "${jyr4p3}-${jmo2p3}-${jda2p3}";
+  $datetim = $julianyyyymmddprt{'curr+3.'} . " 12:00:00";
+  $LOCALTIME_ID{$regionkey}  = substr `date -d $datetim +%Z `,0,3;
+  $LOCALTIME_ADJ{$regionkey} = substr `date -d $datetim +%z `,0,3;
 
 ### SET CURRENT+4 JULIAN MONTH,DAY,YR
   $juliandayp4 = $julianday + 4;
@@ -938,6 +954,9 @@ $PROXY = "";
   $validda1{'curr+4.'} = &strip_leading_zero( $jda2p4 ); 
   $yymmdd{'curr+4.'} = "${jyr2p4}${jmo2p4}${jda2p4}";
   $julianyyyymmddprt{'curr+4.'} = "${jyr4p4}-${jmo2p4}-${jda2p4}";
+  $datetim = $julianyyyymmddprt{'curr+4.'} . " 12:00:00";
+  $LOCALTIME_ID{$regionkey}  = substr `date -d $datetim +%Z `,0,3;
+  $LOCALTIME_ADJ{$regionkey} = substr `date -d $datetim +%z `,0,3;
 
 ### SET CURRENT+5 JULIAN MONTH,DAY,YR
   $juliandayp5 = $julianday + 5;
@@ -951,6 +970,9 @@ $PROXY = "";
   $validda1{'curr+5.'} = &strip_leading_zero( $jda2p5 ); 
   $yymmdd{'curr+5.'} = "${jyr2p5}${jmo2p5}${jda2p5}";
   $julianyyyymmddprt{'curr+5.'} = "${jyr4p5}-${jmo2p5}-${jda2p5}";
+  $datetim = $julianyyyymmddprt{'curr+5.'} . " 12:00:00";
+  $LOCALTIME_ID{$regionkey}  = substr `date -d $datetim +%Z `,0,3;
+  $LOCALTIME_ADJ{$regionkey} = substr `date -d $datetim +%z `,0,3;
 
 ### SET CURRENT+6 JULIAN MONTH,DAY,YR
   $juliandayp6 = $julianday + 6;
@@ -964,6 +986,9 @@ $PROXY = "";
   $validda1{'curr+6.'} = &strip_leading_zero( $jda2p6 ); 
   $yymmdd{'curr+6.'} = "${jyr2p6}${jmo2p6}${jda2p6}";
   $julianyyyymmddprt{'curr+6.'} = "${jyr4p6}-${jmo2p6}-${jda2p6}";
+  $datetim = $julianyyyymmddprt{'curr+6.'} . " 12:00:00";
+  $LOCALTIME_ID{$regionkey}  = substr `date -d $datetim +%Z `,0,3;
+  $LOCALTIME_ADJ{$regionkey} = substr `date -d $datetim +%z `,0,3;
 
 ### SET CURRENT+7 JULIAN MONTH,DAY,YR
   $juliandayp7 = $julianday + 7;
@@ -977,6 +1002,9 @@ $PROXY = "";
   $validda1{'curr+7.'} = &strip_leading_zero( $jda2p7 ); 
   $yymmdd{'curr+7.'} = "${jyr2p7}${jmo2p7}${jda2p7}";
   $julianyyyymmddprt{'curr+7.'} = "${jyr4p7}-${jmo2p7}-${jda2p7}";
+  $datetim = $julianyyyymmddprt{'curr+7.'} . " 12:00:00";
+  $LOCALTIME_ID{$regionkey}  = substr `date -d $datetim +%Z `,0,3;
+  $LOCALTIME_ADJ{$regionkey} = substr `date -d $datetim +%z `,0,3;
 
 ### CALL TO SET  FTP PARAMETERS
 ### but for NWS must later override directories since since depends on initialization time
@@ -1050,7 +1078,7 @@ $PROXY = "";
   }
   @filedolist = @editedfiledolist;
   ### this used for printing of summary times and again
-  @validdaylist = ( "curr.", "curr+1.", "curr+2.", "curr+3.", "curr+4.", "curr+5.", "curr+6" );
+  @validdaylist = ( "curr.", "curr+1.", "curr+2.", "curr+3.", "curr+4.", "curr+5.", "curr+6", "curr+7" );
 ### START OF SET FILENAME ANAL/FCST/VALID TIME ARRAYS
   $avgextendedvalidtime = 0 ; 
   $nfiles = 0 ; 
@@ -2657,13 +2685,43 @@ sub output_model_results_hhmm ()
   }
 
   # Need to run ncl for pfd_tot and/or avgstars
-  our ($avg_flag, $pfd_flag);
+  our ($avg_flag, $pfd_flag, $pfd1_flag, $pfd2_flag, $pfd3_flag);
   if($pfd_flag){   # Need all this for avg_flag - if anyone wants it!
     # Other ENV_NCL_... will be left over :-)
     $ENV{'ENV_NCL_PARAMS'} = "pfd_tot";
     my $logfile = "$RUNDIR/LOG/ncl.out.0${kdomain}.pfd" ;
     $time = `date +%H:%M:%S`;
     print $PRINTFH "     Plotting parameter \"pfd_tot\" at $time \n";
+
+    `cd $NCLDIR ; ncl -n -p < wrf2gm.ncl > $logfile 2>&1` ;
+  }
+
+  if($pfd1_flag){   # Need all this for avg_flag - if anyone wants it!
+    # Other ENV_NCL_... will be left over :-)
+    $ENV{'ENV_NCL_PARAMS'} = "pfd_tot1";
+    my $logfile = "$RUNDIR/LOG/ncl.out.0${kdomain}.pfd1" ;
+    $time = `date +%H:%M:%S`;
+    print $PRINTFH "     Plotting parameter \"pfd_tot1\" at $time \n";
+
+    `cd $NCLDIR ; ncl -n -p < wrf2gm.ncl > $logfile 2>&1` ;
+  }
+
+  if($pfd2_flag){   # Need all this for avg_flag - if anyone wants it!
+    # Other ENV_NCL_... will be left over :-)
+    $ENV{'ENV_NCL_PARAMS'} = "pfd_tot2";
+    my $logfile = "$RUNDIR/LOG/ncl.out.0${kdomain}.pfd2" ;
+    $time = `date +%H:%M:%S`;
+    print $PRINTFH "     Plotting parameter \"pfd_tot2\" at $time \n";
+
+    `cd $NCLDIR ; ncl -n -p < wrf2gm.ncl > $logfile 2>&1` ;
+  }
+
+  if($pfd3_flag){   # Need all this for avg_flag - if anyone wants it!
+    # Other ENV_NCL_... will be left over :-)
+    $ENV{'ENV_NCL_PARAMS'} = "pfd_tot3";
+    my $logfile = "$RUNDIR/LOG/ncl.out.0${kdomain}.pfd3" ;
+    $time = `date +%H:%M:%S`;
+    print $PRINTFH "     Plotting parameter \"pfd_tot3\" at $time \n";
 
     `cd $NCLDIR ; ncl -n -p < wrf2gm.ncl > $logfile 2>&1` ;
   }
@@ -3003,6 +3061,9 @@ sub chk_not_too_long()
 
 my %ncl_procs;  # Empty Associative Array; Must be a Global
 our $pfd_flag = 0;
+our $pfd1_flag = 0;
+our $pfd2_flag = 0;
+our $pfd3_flag = 0;
 our $avg_flag = 0;
 
 sub output_wrffile_results (@)
@@ -3098,10 +3159,13 @@ sub output_wrffile_results (@)
 	# Thus these params must be removed from list
 	# And then run after main run
 	
-	my @ncl_params = ();
-	our ($pfd_flag, $avg_flag);
-	foreach my $P (@{$PARAMETER_DOLIST{$regionkey}}) {
-      if($P eq "pfd_tot")     { $pfd_flag = 1;}
+    my @ncl_params = ();
+    our ($pfd3_flag, $pfd2_flag, $pfd1_flag, $pfd_flag, $avg_flag);
+    foreach my $P (@{$PARAMETER_DOLIST{$regionkey}}) {
+      if   ($P eq "pfd_tot")  { $pfd_flag = 1;}
+      elsif($P eq "pfd_tot1") { $pfd1_flag = 1;}
+      elsif($P eq "pfd_tot2") { $pfd2_flag = 1;}
+      elsif($P eq "pfd_tot3") { $pfd3_flag = 1;}
       elsif($P eq "avgstars") { $avg_flag = 1;}
       else                    { push @ncl_params, $P; }
     }
