@@ -2800,6 +2800,144 @@ begin
 
 end
 
+procedure do_pfd1()
+local bparam, pfd_mag
+begin
+	; Ensure no leftovers
+	if(isvar("bparam")) then
+		delete(bparam)
+	end if
+
+	if(isvar("opts_bparam")) then
+		delete(opts_bparam)
+	end if
+	opts_bparam = True
+	opts_bparam@mult = 1.0	; Default value; overidden as required
+	ldatafmt = 0		; Overridden as required
+
+	print("*** Doing PFD")
+	opts_bparam@MainTitle = "Potential Flight Distance (Discus, 100 kg ball.)"
+	if( UNITS .eq. "american" ) then
+		opts_bparam@UnitLabel = "[mi]"
+		opts_bparam@unitString = "mi"
+		opts_bparam@ContourParameters = (/ 100., 400., 100. /)
+		qparaminfo = "Param= pfd_tot1 Unit= mi Mult= 1"
+		opts_bparam@mult = 0.621371192237 ; Convert to miles
+	else
+		opts_bparam@UnitLabel = "[km]"
+		opts_bparam@unitString = "km"
+		opts_bparam@ContourParameters = (/ 100., 900., 100. /)
+		qparaminfo = "Param= pfd_tot1 Unit= km Mult= 1"
+		opts_bparam@mult = 1.0
+	end if
+
+	pfd_mag = pfd1()
+
+	if(.not. isatt(pfd_mag, "valid") .or. pfd_mag@valid .ne. True)
+		print("*** PFD error: result not plotted!")
+		return
+	end if
+
+	ldatafmt = plot_contour(wks, bg, pfd_mag, "pfd_tot1", "", alat, alon, gridspacingkm, opts_cn, opts_bparam, opts_bg, ldatafmt)
+	bparam = pfd_mag
+	copy_VarAtts(atts, bparam)
+	bparam@tail = ""
+	write_datafile("pfd_tot1", bparam, opts_bparam, 0)
+
+end
+
+procedure do_pfd2()
+local bparam, pfd_mag
+begin
+	; Ensure no leftovers
+	if(isvar("bparam")) then
+		delete(bparam)
+	end if
+
+	if(isvar("opts_bparam")) then
+		delete(opts_bparam)
+	end if
+	opts_bparam = True
+	opts_bparam@mult = 1.0	; Default value; overidden as required
+	ldatafmt = 0		; Overridden as required
+
+	print("*** Doing PFD")
+	opts_bparam@MainTitle = "Potential Flight Distance (Discus, 100 kg ball.)"
+	if( UNITS .eq. "american" ) then
+		opts_bparam@UnitLabel = "[mi]"
+		opts_bparam@unitString = "mi"
+		opts_bparam@ContourParameters = (/ 100., 400., 100. /)
+		qparaminfo = "Param= pfd_tot2 Unit= mi Mult= 1"
+		opts_bparam@mult = 0.621371192237 ; Convert to miles
+	else
+		opts_bparam@UnitLabel = "[km]"
+		opts_bparam@unitString = "km"
+		opts_bparam@ContourParameters = (/ 100., 900., 100. /)
+		qparaminfo = "Param= pfd_tot2 Unit= km Mult= 1"
+		opts_bparam@mult = 1.0
+	end if
+
+	pfd_mag = pfd2()
+
+	if(.not. isatt(pfd_mag, "valid") .or. pfd_mag@valid .ne. True)
+		print("*** PFD error: result not plotted!")
+		return
+	end if
+
+	ldatafmt = plot_contour(wks, bg, pfd_mag, "pfd_tot2", "", alat, alon, gridspacingkm, opts_cn, opts_bparam, opts_bg, ldatafmt)
+	bparam = pfd_mag
+	copy_VarAtts(atts, bparam)
+	bparam@tail = ""
+	write_datafile("pfd_tot2", bparam, opts_bparam, 0)
+
+end
+
+procedure do_pfd3()
+local bparam, pfd_mag
+begin
+	; Ensure no leftovers
+	if(isvar("bparam")) then
+		delete(bparam)
+	end if
+
+	if(isvar("opts_bparam")) then
+		delete(opts_bparam)
+	end if
+	opts_bparam = True
+	opts_bparam@mult = 1.0	; Default value; overidden as required
+	ldatafmt = 0		; Overridden as required
+
+	print("*** Doing PFD")
+	opts_bparam@MainTitle = "Potential Flight Distance (Discus, 100 kg ball.)"
+	if( UNITS .eq. "american" ) then
+		opts_bparam@UnitLabel = "[mi]"
+		opts_bparam@unitString = "mi"
+		opts_bparam@ContourParameters = (/ 100., 400., 100. /)
+		qparaminfo = "Param= pfd_tot3 Unit= mi Mult= 1"
+		opts_bparam@mult = 0.621371192237 ; Convert to miles
+	else
+		opts_bparam@UnitLabel = "[km]"
+		opts_bparam@unitString = "km"
+		opts_bparam@ContourParameters = (/ 100., 900., 100. /)
+		qparaminfo = "Param= pfd_tot3 Unit= km Mult= 1"
+		opts_bparam@mult = 1.0
+	end if
+
+	pfd_mag = pfd3()
+
+	if(.not. isatt(pfd_mag, "valid") .or. pfd_mag@valid .ne. True)
+		print("*** PFD error: result not plotted!")
+		return
+	end if
+
+	ldatafmt = plot_contour(wks, bg, pfd_mag, "pfd_tot3", "", alat, alon, gridspacingkm, opts_cn, opts_bparam, opts_bg, ldatafmt)
+	bparam = pfd_mag
+	copy_VarAtts(atts, bparam)
+	bparam@tail = ""
+	write_datafile("pfd_tot3", bparam, opts_bparam, 0)
+
+end
+
 ; AVGSTARS
 procedure do_avgstars()
 local bparam, avgstars_mag

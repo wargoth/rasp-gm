@@ -174,6 +174,18 @@ do p = 0, dimsizes(ParamList)-1
 		print("*** Doing pfd_tot")
 		do_pfd()
 	end if
+	if(ParamList(p) .eq. "pfd_tot1")
+		print("*** Doing pfd_tot1")
+		do_pfd1()
+	end if
+	if(ParamList(p) .eq. "pfd_tot2")
+		print("*** Doing pfd_tot2")
+		do_pfd2()
+	end if
+	if(ParamList(p) .eq. "pfd_tot3")
+		print("*** Doing pfd_tot3")
+		do_pfd3()
+	end if
 end do
 
 print("NORMAL END of wrf2gm.ncl")
