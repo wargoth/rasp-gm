@@ -3,7 +3,7 @@
 # This script downloads GFS data for a lat/long specified region.
 # It makes use of the g2sub scripts from NOAA for their NOMADS high availability
 # system. The current URL to get an index of the NOMADS system is:
-# http://nomads.ncep.noaa.gov/
+# https://nomads.ncep.noaa.gov/
 #
 # Script is based on the ftpgetdat_ftp2u.pl script originally written by
 # Paul Hope (Cape Town, South Africa) Jan 2006, updated May 2007.
@@ -16,12 +16,12 @@ use warnings;
 $| = 1; # turns on stdout/err autoflushing
 
 # Base url to use.
-# 0.5 deg my $SERVERURL = 'http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p50.pl
+# 0.5 deg my $SERVERURL = 'https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p50.pl
 #
 # 0.25 deg
-my $SERVERURL  = 'http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl';
+my $SERVERURL  = 'https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl';
 # 0.25 deg - Secondary Variables
-my $SERVERURLB = 'http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25b.pl';
+my $SERVERURLB = 'https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25b.pl';
 
 # the maximum number of tries to get the file
 my $MAX_TRIES = 20;
