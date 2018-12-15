@@ -1148,20 +1148,20 @@ $PROXY = "";
       $filenamehead{$ifile} = sprintf '%02d%03d',($jyr2,$julianday);
       $filetimes{$ifile} = sprintf '%02d%06d.grib',($fileanaltime,$ftime);
     }
-    elsif ( $gribftpsite1 eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'ETA' ) { 
+    elsif ( $gribftpsite1 eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'ETA' ) { 
       $filenamehead{$ifile} = '';
       $filetimes{$ifile} = sprintf 'nam.t%02dz.awip3d%02d.tm00.grib2',$fileanaltime,$ftime;  
     }
-    elsif ( $gribftpsite1 eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSN' ) { 
+    elsif ( $gribftpsite1 eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSN' ) { 
       $filenamehead{$ifile} = '';
       $filetimes{$ifile} = sprintf 'gfs.t%02dz.pgrb2.0p50.f%03d',$fileanaltime,$ftime;
     }
-    elsif ( $gribftpsite1 eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSA' ) { 
+    elsif ( $gribftpsite1 eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSA' ) { 
       $filenamehead{$ifile} = '';
       # $filetimes{$ifile} = sprintf 'gfs.t%02dz.pgrbf%02d',$fileanaltime,$ftime; # Change to new filenames 14 Jan 2014
       $filetimes{$ifile} = sprintf 'gfs.t%02dz.pgrb2.0p25.f%03d',$fileanaltime,$ftime; # Use 0.25deg data for GFSA
     }
-    elsif ( $gribftpsite1 eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'AVN' ) {
+    elsif ( $gribftpsite1 eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'AVN' ) {
       $filenamehead{$ifile} = '';
       $filetimes{$ifile} = sprintf 'gfs.t%02dz.pgrbf%02d',$fileanaltime,$ftime;
     }
@@ -3344,7 +3344,7 @@ sub setup_ftp_parameters ()
     ### if change gribftpsite(s) also need changes below and in gribftpget
     ### *NB* FILENAMES MUST BE SAME AT ALTERNATE SITE $gribftpsite2
     # $gribftpsite1 = 'ftpprd.ncep.noaa.gov';
-    $gribftpsite1 = 'http://nomads.ncep.noaa.gov';
+    $gribftpsite1 = 'https://nomads.ncep.noaa.gov';
     $gribftpsiteid1 = 'ETA';
     $gribftpsite2 = '';
     $gribftpsiteid2 = '';
@@ -3362,7 +3362,7 @@ sub setup_ftp_parameters ()
     ### if change gribftpsite(s) also need changes below and in gribftpget
     ### *NB* FILENAMES MUST BE SAME AT ALTERNATE SITE $gribftpsite2
     # $gribftpsite1 = 'ftpprd.ncep.noaa.gov';
-    $gribftpsite1 = 'http://nomads.ncep.noaa.gov';
+    $gribftpsite1 = 'https://nomads.ncep.noaa.gov';
     $gribftpsiteid1 = 'GFS';
     $gribftpsite2 = '';
     $gribftpsiteid2 = '';
@@ -3379,7 +3379,7 @@ sub setup_ftp_parameters ()
     ### if change gribftpsite(s) also need changes below and in gribftpget
     ### *NB* FILENAMES MUST BE SAME AT ALTERNATE SITE $gribftpsite2
     # $gribftpsite1 = 'ftpprd.ncep.noaa.gov';
-    $gribftpsite1 = 'http://nomads.ncep.noaa.gov';
+    $gribftpsite1 = 'https://nomads.ncep.noaa.gov';
     $gribftpsiteid1 = 'GFSA';
     $gribftpsite2 = '';
     $gribftpsiteid2 = '';
@@ -3394,7 +3394,7 @@ sub setup_ftp_parameters ()
     ### if change gribftpsite(s) also need changes below and in gribftpget
     ### *NB* FILENAMES MUST BE SAME AT ALTERNATE SITE $gribftpsite2
     #$gribftpsite1 = 'ftpprd.ncep.noaa.gov';
-    $gribftpsite1 = 'http://nomads.ncep.noaa.gov';
+    $gribftpsite1 = 'https://nomads.ncep.noaa.gov';
     $gribftpsiteid1 = 'AVN';
     $gribftpsite2 = '';
     $gribftpsiteid2 = '';
@@ -3623,13 +3623,13 @@ sub do_getgrib_selection ()
                $gribftpdirectory[2] = "";
                $gribftpdirectory[3] = "";
              }
-             elsif ( $gribftpsite eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'ETA' )
+             elsif ( $gribftpsite eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'ETA' )
              {     
                $gribftpdirectory[1] = sprintf 'nam.%04d%02d%02d',$jyr4,$jmo2,$jda2;
                $gribftpdirectory[2] = sprintf 'nam.%04d%02d%02d',$jyr4m1,$jmo2m1,$jda2m1;
                $gribftpdirectory[3] = sprintf 'nam.%04d%02d%02d',$jyr4p1,$jmo2p1,$jda2p1;
              }
-             elsif ( $gribftpsite eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSN' || $gribftpsite eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSA' ||  $gribftpsite eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'AVN' )
+             elsif ( $gribftpsite eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSN' || $gribftpsite eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSA' ||  $gribftpsite eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'AVN' )
              {
                $gribftpdirectory[1] = sprintf 'gfs.%04d%02d%02d%02d',$jyr4,$jmo2,$jda2,$fileanaltimes{$ifile};
                $gribftpdirectory[0] = sprintf 'gfs.%04d%02d%02d%02d',$jyr4m1,$jmo2m1,$jda2m1,$fileanaltimes{$ifile};
@@ -3799,7 +3799,7 @@ sub do_getgrib_selection ()
               {
                 if( $gribftpsite eq 'gsdftp.fsl.noaa.gov' || $gribftpsite eq 'eftp.fsl.noaa.gov' )
                   { $remotegribfilesize = (split(/  */,$lslist[$ii],6))[4]; }
-                elsif( $gribftpsite eq 'http://nomads.ncep.noaa.gov' )
+                elsif( $gribftpsite eq 'https://nomads.ncep.noaa.gov' )
                   {
                     $remotegribfilesize = (split(/  */,$lslist[$ii],6))[4];
                   }
@@ -3897,22 +3897,22 @@ sub do_getgrib_selection ()
       $ifile = "${1}Z+${2}";
     }
    ### for NCEP filename
-    elsif ( $gribftpsite eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'ETA' && $filename =~ m|^nam\.t([0-9][0-9])z\.awip3d([0-9][0-9])\.tm00.grib2$| )
+    elsif ( $gribftpsite eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'ETA' && $filename =~ m|^nam\.t([0-9][0-9])z\.awip3d([0-9][0-9])\.tm00.grib2$| )
     {
       $ifile = "${1}Z+${2}";
     }
    ### for NCEP filename
-    elsif ( $gribftpsite eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSN' && $filename =~ m|^gfs\.t([0-9][0-9])z\.pgrb2f([0-9][0-9])$| )
+    elsif ( $gribftpsite eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSN' && $filename =~ m|^gfs\.t([0-9][0-9])z\.pgrb2f([0-9][0-9])$| )
     {
       $ifile = "${1}Z+${2}";
     }
    ### for NCEP filename
-    elsif ( $gribftpsite eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSA' && $filename =~ m|^gfs\.t([0-9][0-9])z\.pgrbf([0-9][0-9])$| )
+    elsif ( $gribftpsite eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSA' && $filename =~ m|^gfs\.t([0-9][0-9])z\.pgrbf([0-9][0-9])$| )
     {
       $ifile = "${1}Z+${2}";
     }
    ### for NCEP filename
-    elsif ( $gribftpsite eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'AVN' && $filename =~ m|^gfs\.t([0-9][0-9])z\.pgrbf([0-9][0-9])$| )
+    elsif ( $gribftpsite eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'AVN' && $filename =~ m|^gfs\.t([0-9][0-9])z\.pgrbf([0-9][0-9])$| )
     {
       $ifile = "${1}Z+${2}";
     }
@@ -4066,11 +4066,11 @@ sub gribftpls ()
   ###      (and might later use other features, such as filename-only-list, macros, etc)
   my $LSFTPMETHOD = 'CURL';
   my ( $ID );
-  if ( $FTPSITE eq 'http://nomads.ncep.noaa.gov' )
+  if ( $FTPSITE eq 'https://nomads.ncep.noaa.gov' )
   {
     $ID = "anonymous $ADMIN_EMAIL_ADDRESS";
   }
-  elsif ( $FTPSITE eq 'http://nomads.ncep.noaa.gov' )
+  elsif ( $FTPSITE eq 'https://nomads.ncep.noaa.gov' )
   {
     $ID = "anonymous $ADMIN_EMAIL_ADDRESS";
   }
@@ -4422,10 +4422,10 @@ sub latest_ls_file_info ()
         || ( $gribftpsite eq 'tgftp.nws.noaa.gov' && $GRIBFILE_MODEL eq 'GFSN' && $filename =~ m/\.pgrbf\./ ) 
         || ( $gribftpsite eq 'tgftp.nws.noaa.gov' && $GRIBFILE_MODEL eq 'AVN' && $filename =~ m/\.pgrbf\./ ) 
         || ( $gribftpsite eq 'gsdftp.fsl.noaa.gov' && $GRIBFILE_MODEL eq 'FSL' && $filename =~ m/\.grib$/ ) 
-        || ( $gribftpsite eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'ETA' && $filename =~ m/\.awip3dd/ ) 
-        || ( $gribftpsite eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSN' && $filename =~ m/\.pgrb2f/ ) 
-        || ( $gribftpsite eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSA' && $filename =~ m/\.pgrbf/ ) 
-        || ( $gribftpsite eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'AVN' && $filename =~ m/\.pgrbf/ ) 
+        || ( $gribftpsite eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'ETA' && $filename =~ m/\.awip3dd/ ) 
+        || ( $gribftpsite eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSN' && $filename =~ m/\.pgrb2f/ ) 
+        || ( $gribftpsite eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'GFSA' && $filename =~ m/\.pgrbf/ ) 
+        || ( $gribftpsite eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'AVN' && $filename =~ m/\.pgrbf/ ) 
        ) )
       {
         $ilatest = $i;

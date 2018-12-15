@@ -208,7 +208,7 @@ sub jchomp(@)
       elsif ( $gribftpsite eq "gsdftp.fsl.noaa.gov" )
       { $ID='ftp apassword'; }
       ### ARCHIVE-ADDED
-      elsif ( substr( $gribftpsite, 0, 7 ) eq 'http://' )
+      elsif ( substr( $gribftpsite, 0, 8 ) eq 'https://' )
       { $ID=''; }
       else
       {
@@ -254,7 +254,7 @@ sub jchomp(@)
       elsif ( $LSFTPMETHOD eq "CURL" )
       {
         #ARCHIVE-ADDED
-        if ( substr( $gribftpsite, 0, 7 ) eq 'http://' )
+        if ( substr( $gribftpsite, 0, 8 ) eq 'https://' )
         {
          `curl -v -s -f -o "${GRIBDIR}/${filename}" "${gribftpsite}/${FTPDIRECTORY}/${filename}" > $TMPFILE1 2>$TMPFILE2`;
           #4test: print "curl -v -s -o ${GRIBDIR}/${filename} ${gribftpsite}/${FTPDIRECTORY}/${filename} > $TMPFILE1 2>$TMPFILE2 \n";
