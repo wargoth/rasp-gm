@@ -67,7 +67,7 @@ $url = "${SERVERURL}"
           ."\&rightlon=$rightlong"
           ."\&toplat=$toplat"
           ."\&bottomlat=$bottomlat"
-          ."\&dir=\%2Fgfs.$curdate$runTime";
+          ."\&dir=\%2Fgfs.$curdate/$runTime";
 
 # And for the additional parameters
 my $sourcefileb;
@@ -83,7 +83,7 @@ $urlb = "${SERVERURLB}"
         ."\&rightlon=$rightlong"
         ."\&toplat=$toplat"
         ."\&bottomlat=$bottomlat"
-        ."\&dir=\%2Fgfs.$curdate$runTime";
+        ."\&dir=\%2Fgfs.$curdate/$runTime";
 
 
 #4debug:
