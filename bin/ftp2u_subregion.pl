@@ -67,7 +67,8 @@ $url = "${SERVERURL}"
           ."\&rightlon=$rightlong"
           ."\&toplat=$toplat"
           ."\&bottomlat=$bottomlat"
-          ."\&dir=\%2Fgfs.$curdate/$runTime";
+          ."\&dir=\%2Fgfs.$curdate/$runTime"
+          ."/atmos"; # change 2021-03-23
 
 # And for the additional parameters
 my $sourcefileb;
@@ -83,7 +84,8 @@ $urlb = "${SERVERURLB}"
         ."\&rightlon=$rightlong"
         ."\&toplat=$toplat"
         ."\&bottomlat=$bottomlat"
-        ."\&dir=\%2Fgfs.$curdate/$runTime";
+        ."\&dir=\%2Fgfs.$curdate/$runTime"
+        ."/atmos"; # change 2021-03-23
 
 
 #4debug:
